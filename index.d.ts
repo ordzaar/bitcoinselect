@@ -21,4 +21,4 @@ export interface SelectedUTXO {
     outputs?: Target[],
     fee: number
 }
-export default function coinSelect(utxos: UTXO[], outputs: Target[], feeRate: number): SelectedUTXO;
+export default function coinSelect(utxos: UTXO[], outputs: Target[], feeRate: number, changeAddress?: string): SelectedUTXO;
