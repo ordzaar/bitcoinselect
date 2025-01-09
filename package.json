@@ -26,13 +26,48 @@
     "accumulative.js",
     "blackjack.js",
     "break.js",
+    "funding.js",
+    "funding.d.ts",
     "index.js",
     "split.js",
     "utils.js",
+    "utils.d.ts",
     "index.d.ts"
   ],
   "main": "index.js",
   "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.js"
+    },
+    "./accumulative": {
+      "import": "./accumulative.js",
+      "require": "./accumulative.js"
+    },
+    "./blackjack": {
+      "import": "./blackjack.js",
+      "require": "./blackjack.js"
+    },
+    "./break": {
+      "import": "./break.js",
+      "require": "./break.js"
+    },
+    "./funding": {
+      "import": "./funding.js",
+      "require": "./funding.js",
+      "types": "./funding.d.ts"
+    },
+    "./split": {
+      "import": "./split.js",
+      "require": "./split.js"
+    },
+    "./utils": {
+      "import": "./utils.js",
+      "require": "./utils.js",
+      "types": "./utils.d.ts"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ChrisCho-H/bitcoinselect.git"

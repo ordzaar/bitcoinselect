@@ -1,9 +1,9 @@
 // baseline estimates, used to improve performance
-var TX_EMPTY_SIZE = 4 + 1 + 1 + 4
-var TX_INPUT_BASE = 32 + 4 + 1 + 4
+var TX_EMPTY_SIZE = 4 + 1 + 1 + 4 + 0.5 // version + inputcount + outputcount + locktime + marker-flag (segwit)
+var TX_INPUT_BASE = 32 + 4 + 1 + 4 // txid + vout + scriptsigsize + sequence
 var TX_INPUT_PUBKEYHASH = 107
 var TX_INPUT_SEGWIT = 27
-var TX_INPUT_TAPROOT = 17 // round up 16.5 bytes
+var TX_INPUT_TAPROOT = 16.5 // round up 16.5 bytes - witness sig for key path spend
 var TX_OUTPUT_BASE = 8 + 1
 var TX_OUTPUT_PUBKEYHASH = 25
 var TX_OUTPUT_SCRIPTHASH = 23
@@ -20,8 +20,8 @@ function inputBytes (input) {
 
 function outputBytes (output) {
   return TX_OUTPUT_BASE + (output.script ? output.script.length
-    : output.address?.startsWith('bc1') || output.address?.startsWith('tb1')
-      ? output.address?.length === 42 ? TX_OUTPUT_SEGWIT : TX_OUTPUT_SEGWIT_SCRIPTHASH
+    : output.address?.startsWith('bc1') || output.address?.startsWith('tb1') || output.address?.startsWith('bcrt1')
+      ? output.address?.length === 42 || output.address?.length === 44 ? TX_OUTPUT_SEGWIT : TX_OUTPUT_SEGWIT_SCRIPTHASH
       : output.address?.startsWith('3') || output.address?.startsWith('2')
         ? TX_OUTPUT_SCRIPTHASH : TX_OUTPUT_PUBKEYHASH
   )
@@ -41,7 +41,6 @@ function transactionBytes (inputs, outputs) {
 function uintOrNaN (v) {
   if (typeof v !== 'number') return NaN
   if (!isFinite(v)) return NaN
-  if (Math.floor(v) !== v) return NaN
   if (v < 0) return NaN
   return v
 }
@@ -56,14 +55,15 @@ function sumOrNaN (range) {
 
 var BLANK_OUTPUT = outputBytes({})
 
-function finalize (inputs, outputs, feeRate) {
+function finalize (inputs, outputs, feeRate, changeAddress) {
   var bytesAccum = transactionBytes(inputs, outputs)
-  var feeAfterExtraOutput = feeRate * (bytesAccum + BLANK_OUTPUT)
+  const changeOutputBytes = changeAddress ? outputBytes({address:changeAddress}): BLANK_OUTPUT
+  var feeAfterExtraOutput = Math.ceil(feeRate * (bytesAccum + changeOutputBytes))
   var remainderAfterExtraOutput = sumOrNaN(inputs) - (sumOrNaN(outputs) + feeAfterExtraOutput)
 
   // is it worth a change output?
   if (remainderAfterExtraOutput > dustThreshold({}, feeRate)) {
-    outputs = outputs.concat({ value: remainderAfterExtraOutput })
+    outputs = outputs.concat({ value: Math.ceil(remainderAfterExtraOutput) })
   }
 
   var fee = sumOrNaN(inputs) - sumOrNaN(outputs)

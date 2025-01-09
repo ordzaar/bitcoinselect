@@ -1,0 +1,68 @@
+[
+  {
+    "description": "valid funding with 1 input and 2 outputs",
+    "feeRate": 1,
+    "inputs": [
+      1000
+    ],
+    "outputs": [
+      1000,
+      600
+    ],
+    "expected": {
+      "funding": 826,
+      "totalOutput": 1600,
+      "totalInput": 1000,
+      "fee": 226
+    }
+  },
+  {
+    "description": "valid funding with 1 input (+witnessUtxo) and 2 outputs",
+    "feeRate": 1,
+    "inputs": [
+      {
+        "value": 1000,
+        "witnessUtxo": {}
+      }
+    ],
+    "outputs": [
+      1000,
+      600
+    ],
+    "expected": {
+      "funding": 746,
+      "totalOutput": 1600,
+      "totalInput": 1000,
+      "fee": 146
+    }
+  },
+  {
+    "description": "negative funding when inputs > outputs",
+    "feeRate": 1,
+    "inputs": [
+      2000
+    ],
+    "outputs": [
+      1000,
+      600
+    ],
+    "expected": {
+      "funding": -174,
+      "totalOutput": 1600,
+      "totalInput": 2000,
+      "fee": 226
+    }
+  },
+  {
+    "description": "bad feerate",
+    "feeRate": 1.5,
+    "inputs": [
+      2000
+    ],
+    "outputs": [
+      1000,
+      600
+    ],
+    "expected": {}
+  }
+]
